@@ -19,7 +19,6 @@ def caption_match(filepath):
     # Matches Image to Caption, assumes same name
     
     match_name = os.path.splitext(filepath)[0] + ".txt"
-    print(match_name)
     if os.path.isfile(match_name) is True:
         return match_name
     else:
@@ -31,7 +30,6 @@ def get_data(folder_value, file_value, window):
     
     try:
         filename = os.path.join(folder_value, file_value)
-        print(filename)
         caption_file = caption_match(filename)
         window["-IMAGE OUT-"].update(filename)
         window["-IMAGE-"].update(filename=filename)
