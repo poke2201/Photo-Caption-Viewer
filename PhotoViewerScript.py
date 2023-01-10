@@ -19,23 +19,27 @@ def caption_match(filepath):
     # Matches Image to Caption, assumes same name
     
     match_name = os.path.splitext(filepath)[0] + ".txt"
-
+    print(match_name)
     if os.path.isfile(match_name) is True:
         return match_name
     else:
-        raise FileNotFoundError
+        return ""
 
 def get_data(folder_value, file_value, window):
+
+    #DOES NOT WORK WITH SPACES IN IMAGE NAME
+    
     try:
         filename = os.path.join(folder_value, file_value)
+        print(filename)
         caption_file = caption_match(filename)
         window["-IMAGE OUT-"].update(filename)
         window["-IMAGE-"].update(filename=filename)
-        window["-CAPTION_FILE-"].update(value=caption_file)
-
-        with open(caption_file) as caption:
-            lines = caption.read()
-            window["-CAPTION_DATA-"].update(value = lines)
+        if caption_file != "":
+            window["-CAPTION_FILE-"].update(value=caption_file)
+            with open(caption_file) as caption:
+                lines = caption.read()
+                window["-CAPTION_DATA-"].update(value = lines)
 
     except Exception as e:
         print(e)
@@ -246,9 +250,14 @@ while True:
         elif event == "Save":
             filename = os.path.join(values["-FOLDER-"], values["-FILE LIST-"][0])
             caption_file = caption_match(filename)
-            with open(caption_file, "w") as caption:
-                caption.write(values["-CAPTION_DATA-"])
-            window["-LOG CAPTION-"].update(f'Saved {values["-FILE LIST-"][0]}')
+
+            if caption_file == "":
+                window["-LOG CAPTION-"].update(f'No caption found in folder')
+
+            else:
+                with open(caption_file, "w") as caption:
+                    caption.write(values["-CAPTION_DATA-"])
+                window["-LOG CAPTION-"].update(f'Saved {values["-FILE LIST-"][0]}')
 
     else:
         if event == "Find and Replace Batch Captions":
