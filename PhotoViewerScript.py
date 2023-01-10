@@ -173,8 +173,9 @@ layout = [
 # ----- Event Loop -----
 
 window = sg.Window("Image Viewer", layout, return_keyboard_events=True, finalize=True)
-window.bind('<TAB>', 'Next Image')
-window.bind('<SHIFT-TAB>', 'Previous Image')
+window.bind("<Down>", "Next Image")
+window.bind("<Up>", "Previous Image")
+window.bind("<Delete>", "Delete Image")
 
 while True:
     event, values = window.read()
@@ -229,6 +230,15 @@ while True:
 
             # Update Values
             get_data(values["-FOLDER-"], image_list[iter_index], window)
+
+            try:
+                image_list, caption_list = initialize_files(folder)
+
+            except Exception as e:
+                print(e)
+                image_list, caption_list = []
+
+            window["-FILE LIST-"].update(image_list)
 
         if event == "Find and Replace Batch Captions":
             find_replace_window(values["-FOLDER-"])
