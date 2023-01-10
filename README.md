@@ -9,6 +9,8 @@ Use package manager [pip](https://pip.pypa.io/en/stable/) to install PySimpleGUI
 python.exe -m pip install PySimpleGUI
 ```
 
+Download script to your computer and run.
+
 ## Usage
 Run the script and let the GUI open.
 Select a folder with your training images and captions by clicking on the **Browse** button.  The program will still show images without captions but functionality becomes a photo app.
