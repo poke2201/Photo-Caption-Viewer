@@ -31,7 +31,7 @@ This feature is for bulk changing captions if there is something you really need
 
 - **Prefix** - Prepends text before caption.  **Original Text** not required.
 
-- **Suffix* - Adds text to the end of caption. **Original Text** not required.
+- **Suffix** - Adds text to the end of caption. **Original Text** not required.
 
 - **Replace** - Finds phrase and replaces with replacement.
 
