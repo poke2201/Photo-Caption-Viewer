@@ -8,8 +8,7 @@ Use package manager [pip](https://pip.pypa.io/en/stable/) to install PySimpleGUI
 ```bash
 python.exe -m pip install PySimpleGUI
 ```
-
-Download script to your computer and run.
+On the GitHub page, click the green Code button, download as zip, then unzip it. Then if you have python configured to run .py files, just double click PhotoViewerScript.py
 
 ## Usage
 Run the script and let the GUI open.
