@@ -18,7 +18,7 @@ Select a folder with your training images and captions by clicking on the **Brow
 
 The GUI will load a list of images in the folder along with paired captions.  The program is assuming the captions are the **same exact name as the picture**. Select any picture and the image and caption will load.
 
-![image](https://user-images.githubusercontent.com/48573359/211655290-b330af4f-c0a3-491c-a798-48dc46ce46bb.png)
+![image](https://user-images.githubusercontent.com/48573359/211935468-fd6fd3bd-ca9f-45ec-9c96-f264fd674ec5.png)
 
 ### Find and Replace Bulk Caption Feature
 This feature is for bulk changing captions if there is something you really need to add.  
