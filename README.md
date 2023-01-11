@@ -42,8 +42,6 @@ This feature is for bulk changing captions if there is something you really need
 - **DEL** - Deletes image. **DOES NOT HAVE A CONFIRMATION SCREEN**.
 
 
-
-
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first
