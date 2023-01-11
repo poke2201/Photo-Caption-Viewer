@@ -12,7 +12,7 @@ On the GitHub page, click the green Code button, download as zip, then unzip it.
 
 ## Usage
 Run the script and let the GUI open.
-Select a folder with your training images and captions by clicking on the **Browse** button.  The program will still show images without captions but functionality becomes a photo app.
+Select a folder with your training images and captions by clicking on the **Browse** button.  The program will still show images without captions but functionality becomes a photo app. As this program was written using Python's native tkinter package, **.JPG** photos are **not supported**.  Make sure all pictures are in .png.
 
 ![image](https://user-images.githubusercontent.com/48573359/211654614-970fd97f-181d-4973-9ebd-7b03032ad594.png)
 
