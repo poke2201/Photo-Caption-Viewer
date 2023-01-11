@@ -6,13 +6,15 @@ class EmptyFindText(Exception):
     "Find Text in Add Mode is empty"
     pass
 
+class FileMissing(Exception):
+    "File went missing before image updated"
+    pass
 
 def initialize_files(folder_path):
 
-    image_list = [file for file in os.listdir(folder_path) if file.endswith(".png") or file.endswith(".jpg")]
-    caption_list = [file for file in os.listdir(folder_path) if file.endswith(".txt")]
+    image_list = [file for file in os.listdir(folder_path) if file.endswith(".png")]
 
-    return image_list, caption_list
+    return image_list
 
 def caption_match(filepath):
     
@@ -24,7 +26,19 @@ def caption_match(filepath):
     else:
         return ""
 
-def get_data(folder_value, file_value, window):
+def update_folders():
+    if values["-FOLDER-"] == "":
+        # Needed for copy paste functionality, event loop will update values["-FOLDER-"] next iteration
+        pass
+    else:
+        image_list = initialize_files(values["-FOLDER-"])
+        window["-FILE LIST-"].update(image_list, set_to_index=0)
+        window["-FILE LIST-"].set_focus()
+        get_data(values["-FOLDER-"], image_list[0], window)
+
+        return image_list
+
+def get_data(folder_value, file_value, window, deletion_check_bool=False):
 
     #DOES NOT WORK WITH SPACES IN IMAGE NAME
     
@@ -32,28 +46,37 @@ def get_data(folder_value, file_value, window):
         filename = os.path.join(folder_value, file_value)
         caption_file = caption_match(filename)
         window["-IMAGE OUT-"].update(filename)
-        window["-IMAGE-"].update(filename=filename)
+        if os.path.isfile(filename) == True:
+            window["-IMAGE-"].update(filename=filename)
+        else:
+            raise FileMissing("File went missing before image updated.")
         if caption_file != "":
             window["-CAPTION_FILE-"].update(value=caption_file)
             with open(caption_file) as caption:
                 lines = caption.read()
                 window["-CAPTION_DATA-"].update(value = lines)
+        else:
+            window["-CAPTION_DATA-"].update(value = '')
+            window["-LOG CAPTION-"].update(value='No caption found in folder')
 
     except Exception as e:
-        print(e)
+        # Handles error only when GUI event deletes items. Default boolean value is false to prevent accidental deletions.
+        if deletion_check_bool == False:
+            sg.popup_error(f'An error happened.  Here is the info: {e} Refreshing window and removing missing reference.')
+            update_folders()
+        else:
+            pass
 
 def find_replace_caption(txt_file, replace_text, find_text='', mode='Add'):
     with open(txt_file, 'r') as caption_file:
         caption = caption_file.read()
-        
 
         if mode == 'Add':
 
             #ONLY WORKS ON THE FIRST INSTANCE CURRENTLY
             
             if find_text == '':
-                print("Missing Find Text")
-                raise EmptyFindText
+                raise EmptyFindText("Find Text in Add Mode is empty.")
             else:
                 split_caption = caption.split(' ')
                 insert_index = [index for index, caption_part in enumerate(split_caption) if find_text in caption_part][0] + 1
@@ -68,8 +91,7 @@ def find_replace_caption(txt_file, replace_text, find_text='', mode='Add'):
         
         else:
             if find_text == '':
-                print("Missing Find Text")
-                raise EmptyFindText
+                raise EmptyFindText("Find Text in Add Mode is empty.")
             else:
                 caption = caption.replace(find_text, replace_text)
 
@@ -111,7 +133,7 @@ def find_replace_window(folder):
                 sg.popup('Operation Completed!')
                 
             except EmptyFindText:
-                print("Find Text in Add Mode is empty")
+                sg.popup_error("Original (Find) Text is empty, this operation requires a find text.")
 
     window.close()
 
@@ -128,13 +150,13 @@ file_list_column =[
 
 image_viewer_column = [
     [sg.Text("Image Selected:", size=(40,1))],
-    [sg.Text("Select File", key="-IMAGE OUT-", size=(30,2))],
+    [sg.Text("Select File", key="-IMAGE OUT-", size=(50,3))],
     [sg.Image(key="-IMAGE-")],
 ]
 
 text_viewer_column = [
     [sg.Text("Caption Selected:", size=(40,1))],
-    [sg.Text("Select File", key="-CAPTION_FILE-", size=(30,2))],
+    [sg.Text("Select File", key="-CAPTION_FILE-", size=(50,3))],
     [sg.Multiline(key="-CAPTION_DATA-",
                         size=(50,10),
                         default_text="Select image file to display found caption"),
@@ -181,20 +203,17 @@ while True:
 
     elif event == "-FOLDER-":
         try:
-            if values["-FOLDER-"] == "":
-                # Needed for copy paste functionality, event loop will update values["-FOLDER-"] next iteration
-                pass
-            else:
-                image_list, caption_list = initialize_files(values["-FOLDER-"])
-                window["-FILE LIST-"].update(image_list, set_to_index=0)
-                window["-FILE LIST-"].set_focus()
-                get_data(values["-FOLDER-"], image_list[0], window)
+            image_list = update_folders()
+            
         except Exception as e:
             print(e)
 
     if len(values["-FILE LIST-"]) > 0:
         if event == "-FILE LIST-":
-            get_data(values["-FOLDER-"], values["-FILE LIST-"][0], window)
+            try:
+                get_data(values["-FOLDER-"], values["-FILE LIST-"][0], window)
+            except Exception as e:
+                print(e)
 
         elif event == "Previous Image":
             # Iterate Up File List
@@ -228,14 +247,12 @@ while True:
             os.remove(caption_file)
 
             # Update Values
-            get_data(values["-FOLDER-"], image_list[iter_index], window)
-
             try:
-                image_list, caption_list = initialize_files(folder)
+                get_data(values["-FOLDER-"], image_list[iter_index], window, deletion_check_bool=True)
+                image_list = initialize_files(values["-FOLDER-"])
 
-            except Exception as e:
-                print(e)
-                image_list, caption_list = []
+            except IndexError:
+                image_list = []
 
             window["-FILE LIST-"].update(image_list)
 
@@ -263,13 +280,13 @@ while True:
         
         #Error Display without selected files
         elif event == "Previous Image":
-            window["-LOG IMAGE-"].update("File not selected select a file")
+            window["-LOG IMAGE-"].update("File not selected, select a file")
 
         elif event == "Next Image":
-            window["-LOG IMAGE-"].update("File not selected select a file")
+            window["-LOG IMAGE-"].update("File not selected, select a file")
 
         elif event == "Delete Image":
-            window["-LOG IMAGE-"].update("File not selected select a file")
+            window["-LOG IMAGE-"].update("File not selected, select a file")
 
         
             
