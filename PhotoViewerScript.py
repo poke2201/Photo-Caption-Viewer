@@ -121,24 +121,20 @@ def find_replace_window(folder):
 sg.theme('BluePurple')
 
 file_list_column =[
-    [
-        sg.Text('Training Folder'),
-        sg.In(size=(50,2), enable_events=True, key="-FOLDER-"),
-        sg.FolderBrowse(),
-    ],
+    [sg.Push(), sg.Text('Training Folder'), sg.Input(size=(50,2), enable_events=True, key="-FOLDER-"), sg.FolderBrowse(key="-FOLDER-")],
     
-    [sg.Listbox(values=[], size=(40,20), enable_events=True, key="-FILE LIST-")],
+    [sg.Push(), sg.Listbox(values=[], size=(40,20), enable_events=True, key="-FILE LIST-"), sg.Push()],
 ]
 
 image_viewer_column = [
     [sg.Text("Image Selected:", size=(40,1))],
-    [sg.Text("Select File", key="-IMAGE OUT-", auto_size_text=True)],
+    [sg.Text("Select File", key="-IMAGE OUT-", size=(30,2))],
     [sg.Image(key="-IMAGE-")],
 ]
 
 text_viewer_column = [
     [sg.Text("Caption Selected:", size=(40,1))],
-    [sg.Text("Select File", key="-CAPTION_FILE-", auto_size_text=True)],
+    [sg.Text("Select File", key="-CAPTION_FILE-", size=(30,2))],
     [sg.Multiline(key="-CAPTION_DATA-",
                         size=(50,10),
                         default_text="Select image file to display found caption"),
@@ -152,9 +148,9 @@ image_control_column = [[
     sg.Button("Previous Image"),
     sg.Button("Next Image"),
     sg.Button("Delete Image"),
-    sg.Text(key="-LOG IMAGE-")
-]]
-
+    sg.Exit()],
+    [sg.Text(key="-LOG IMAGE-")]
+]
 
 
 # ----- Layout -----
@@ -167,8 +163,7 @@ layout = [
         sg.VSeperator(),
         sg.Column(text_viewer_column), 
     ],
-        [sg.Column(image_control_column)],
-        [sg.Exit()]
+        [sg.Column(image_control_column)]
 ]
 
 
@@ -185,15 +180,17 @@ while True:
         break
 
     elif event == "-FOLDER-":
-        folder = values["-FOLDER-"]
         try:
-            image_list, caption_list = initialize_files(folder)
+            if values["-FOLDER-"] == "":
+                # Needed for copy paste functionality, event loop will update values["-FOLDER-"] next iteration
+                pass
+            else:
+                image_list, caption_list = initialize_files(values["-FOLDER-"])
+                window["-FILE LIST-"].update(image_list, set_to_index=0)
+                window["-FILE LIST-"].set_focus()
+                get_data(values["-FOLDER-"], image_list[0], window)
         except Exception as e:
             print(e)
-            image_list, caption_list = []
-
-        window["-FILE LIST-"].update(image_list)
-
 
     if len(values["-FILE LIST-"]) > 0:
         if event == "-FILE LIST-":
