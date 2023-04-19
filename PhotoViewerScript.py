@@ -192,9 +192,10 @@ layout = [
 # ----- Event Loop -----
 
 window = sg.Window("Image Viewer", layout, return_keyboard_events=True, finalize=True)
-window.bind("<Down>", "Next Image")
-window.bind("<Up>", "Previous Image")
+window.bind("<Control-d>", "Next Image")
+window.bind("<Control-a>", "Previous Image")
 window.bind("<Delete>", "Delete Image")
+window.bind("<Control-s>", "Save")  # new line to bind Ctrl+s to Save
 
 while True:
     event, values = window.read()
